@@ -63,7 +63,7 @@ int main()
 
 	FILE * frame;
 
-	char frame_name[50];
+	char frame_name[100];
 	uint8_t bytes[2];
 	int bytes_read, frame_count = 0;
 	int jpeg_start = 0;
@@ -75,14 +75,22 @@ int main()
 		}
 		if(bytes[0] == 0xFF && bytes[1]==0xD8){
 			jpeg_start=1;
-			memset(frame_name,0,50);
+			memset(frame_name,0,100);
 			sprintf(frame_name,"Frame%d.jpg",frame_count);
 			frame_count++;
 			puts(frame_name);
 			frame = fopen(frame_name,"wb");
+			if(!frame){
+				printf("cant open file for reading\n");
+			}
+			
 		}
 
 		if(jpeg_start){
+			if(!frame){
+				printf("null frame, stop\n");
+				continue;
+			}
 			fwrite(bytes,1,2,frame);
 			if(bytes[0]==0xFF && bytes[1]==0xD9)
 			{
